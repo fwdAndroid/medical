@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:medical/details/paitient_details.dart';
 import 'package:medical/widget/logout_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -17,13 +18,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Image.asset("assets/logo.png"),
           ListTile(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (builder) => PaitientDetails()));
+            },
             trailing: Icon(
               Icons.arrow_forward_ios,
               color: Colors.black,
             ),
-            leading: Image.asset("assets/Group 108.png"),
+            leading: Icon(Icons.details),
             title: Text(
-              "FAQ",
+              "Patient Details",
               style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -46,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 );
               },
-              leading: Image.asset("assets/Group 109.png"),
+              leading: Icon(Icons.logout),
               title: Text(
                 "Logout",
                 style: GoogleFonts.inter(
