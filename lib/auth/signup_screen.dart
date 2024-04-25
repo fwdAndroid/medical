@@ -1,8 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:medical/auth/login_screen.dart';
+import 'package:medical/dashboard/main_dashboard.dart';
+import 'package:medical/func/util.dart';
+import 'package:medical/services/auth_method.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -15,6 +21,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController hospitalController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+
   bool passwordVisible = false;
   bool isPressed = false;
 
@@ -24,6 +33,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     passwordVisible = true;
   }
 
+  Uint8List? _image;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +48,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             )),
         centerTitle: true,
         title: Text(
-          "Sign Up",
+          "Doctor Registration",
           style: GoogleFonts.inter(
               fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
         ),
@@ -46,6 +56,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Stack(
+              children: [
+                _image != null
+                    ? CircleAvatar(
+                        radius: 59, backgroundImage: MemoryImage(_image!))
+                    : CircleAvatar(
+                        radius: 59,
+                        backgroundImage: NetworkImage(
+                            'https://static.remove.bg/remove-bg-web/a6eefcd21dff1bbc2448264c32f7b48d7380cb17/assets/start_remove-c851bdf8d3127a24e2d137a55b1b427378cd17385b01aec6e59d5d4b5f39d2ec.png'),
+                      ),
+                Positioned(
+                    bottom: -10,
+                    left: 70,
+                    child: IconButton(
+                        onPressed: () => selectImage(),
+                        icon: Icon(
+                          Icons.add_a_photo,
+                          color: Colors.white,
+                        )))
+              ],
+            ),
+            SizedBox(
+              height: 23,
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
@@ -59,6 +93,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Icon(
                         Icons.person,
+                        color: Colors.black,
+                      )),
+                  hintStyle:
+                      GoogleFonts.inter(fontSize: 16, color: Color(0xffA1A8B0)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(
+                      color: Color(0xffE5E7EB),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(
+                      color: Color(0xffE5E7EB),
+                    ),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(
+                      color: Color(0xffE5E7EB),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                onTap: () {
+                  _selectDate();
+                },
+                controller: dateController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Color(0xffF9FAFB),
+                  border: InputBorder.none,
+                  hintText: "Date of Birth",
+                  prefixIcon: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.gif_box,
                         color: Colors.black,
                       )),
                   hintStyle:
@@ -179,6 +254,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: hospitalController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Color(0xffF9FAFB),
+                  border: InputBorder.none,
+                  hintText: "Hospital Name",
+                  prefixIcon: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(Icons.local_hospital)),
+                  hintStyle:
+                      GoogleFonts.inter(fontSize: 16, color: Color(0xffA1A8B0)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(
+                      color: Color(0xffE5E7EB),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(
+                      color: Color(0xffE5E7EB),
+                    ),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(
+                      color: Color(0xffE5E7EB),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.leading,
                 title: Text(
@@ -195,6 +305,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       onPressed: () async {
+                        if (_image == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Name is Required")));
+                        }
                         if (nameController.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Name is Required")));
@@ -204,32 +318,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         } else if (passwordController.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Password is Required")));
+                        } else if (dateController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("DOB is Required")));
+                        } else if (hospitalController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Hospital is Required")));
                         } else {
                           setState(() {
                             isPressed = true;
                           });
 
-                          FirebaseAuth.instance.createUserWithEmailAndPassword(
+                          String rse = await AuthMethods().signUpUser(
                               email: emailController.text,
-                              password: passwordController.text);
+                              dob: dateController.text,
+                              pass: passwordController.text,
+                              hospitalName: hospitalController.text,
+                              username: nameController.text,
+                              file: _image!);
+
+                          print(rse);
                           setState(() {
                             isPressed = false;
                           });
-                          FirebaseFirestore.instance
-                              .collection("users")
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .set({
-                            "email": emailController.text,
-                            "password": passwordController.text,
-                            "name": nameController.text,
-                            "uid": FirebaseAuth.instance.currentUser!.uid,
-                          }).then((value) => {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (builder) =>
-                                                LoginScreen()))
-                                  });
+                          if (rse != 'sucess') {
+                            showSnakBar(rse, context);
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (builder) => MainDashboard()));
+                          }
                         }
                       },
                       child: Text(
@@ -269,5 +388,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
+  }
+
+  /// Select Image From Gallery
+  selectImage() async {
+    Uint8List ui = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = ui;
+    });
+  }
+
+  void _selectDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      lastDate: DateTime.now(),
+      firstDate: DateTime(2015),
+      initialDate: DateTime.now(),
+    );
+    if (pickedDate == null) return;
+    dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
   }
 }

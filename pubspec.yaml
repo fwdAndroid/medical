@@ -33,6 +33,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   firebase_auth: ^4.19.1
   firebase_core: ^2.29.0
+  firebase_storage: ^11.7.4
   flutter:
     sdk: flutter
   flutter_seekbar: ^1.0.1
