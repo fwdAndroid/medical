@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medical/dashboard/screens/chat_screen.dart';
-import 'package:medical/dashboard/screens/home_screen.dart';
+import 'package:medical/dashboard/screens/home.dart';
 import 'package:medical/dashboard/screens/profile_screen.dart';
 
 class MainDashboard extends StatefulWidget {

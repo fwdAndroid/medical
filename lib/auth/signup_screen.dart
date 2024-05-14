@@ -307,7 +307,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onPressed: () async {
                         if (_image == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Name is Required")));
+                              SnackBar(content: Text("Image is Required")));
                         }
                         if (nameController.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
