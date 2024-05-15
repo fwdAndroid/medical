@@ -119,13 +119,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_emailController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Email is Required")));
-                      } else if (_passController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Password is Required")));
-                      } else {
+                      if (_emailController.text.isNotEmpty &&
+                          _passController.text.isNotEmpty) {
                         setState(() {
                           isLoading = true;
                         });
@@ -139,6 +134,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (builder) => MainDashboard()));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("All Fields are Required")));
                       }
                     },
                     child: Text(
